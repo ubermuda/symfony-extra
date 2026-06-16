@@ -1,0 +1,39 @@
+{
+    "name": "ubermuda/symfony-extra",
+    "description": "Extra cross-cutting Symfony infrastructure: a declarative CSRF attribute and Playwright e2e test-support subscribers",
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.5",
+        "symfony/config": "^6.4|^7.0|^8.0",
+        "symfony/dependency-injection": "^6.4|^7.0|^8.0",
+        "symfony/event-dispatcher": "^6.4|^7.0|^8.0",
+        "symfony/http-foundation": "^6.4|^7.0|^8.0",
+        "symfony/http-kernel": "^6.4|^7.0|^8.0",
+        "symfony/security-core": "^6.4|^7.0|^8.0",
+        "symfony/security-csrf": "^6.4|^7.0|^8.0"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^2.0",
+        "phpunit/php-code-coverage": "^12.0|^13.0|^14.0",
+        "phpunit/phpunit": "^13.0"
+    },
+    "suggest": {
+        "phpunit/php-code-coverage": "Required by CoverageSubscriber to collect end-to-end coverage from browser-driven test runs",
+        "ext-xdebug": "Required by CoverageSubscriber to record line coverage"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ubermuda\\SymfonyExtra\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ubermuda\\SymfonyExtra\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    }
+}
