@@ -24,7 +24,12 @@ return static function (ContainerConfigurator $container): void {
     $services->set(DisableProfilerForPlaywrightSubscriber::class)
         ->arg('$profiler', service('profiler')->nullOnInvalid());
 
-    $services->set(CoverageSubscriber::class)
-        ->arg('$sourceDir', param('ubermuda_symfony_extra.coverage.source_dir'))
-        ->arg('$outputDir', param('ubermuda_symfony_extra.coverage.output_dir'));
+    // Coverage is a test tool: keep it out of every other environment, so the
+    // X-Coverage header can never make a production request write files.
+    if (in_array($container->env(), ['dev', 'test'], true)) {
+        $services->set(CoverageSubscriber::class)
+            ->arg('$sourceDir', param('ubermuda_symfony_extra.coverage.source_dir'))
+            ->arg('$outputDir', param('ubermuda_symfony_extra.coverage.output_dir'))
+            ->arg('$cacheDir', param('ubermuda_symfony_extra.coverage.cache_dir'));
+    }
 };
