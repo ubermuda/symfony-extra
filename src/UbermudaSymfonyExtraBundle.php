@@ -27,19 +27,24 @@ final class UbermudaSymfonyExtraBundle extends AbstractBundle
                             ->info('Directory where per-request .cov files are written.')
                             ->defaultValue('%kernel.project_dir%/var/coverage')
                         ->end()
+                        ->scalarNode('cache_dir')
+                            ->info('Static analysis cache shared with `phpunit --warm-coverage-cache`. Null disables the cache.')
+                            ->defaultValue('%kernel.project_dir%/.phpunit.cache/code-coverage')
+                        ->end()
                     ->end()
                 ->end()
             ->end();
     }
 
     /**
-     * @param array{coverage: array{source_dir: string, output_dir: string}} $config
+     * @param array{coverage: array{source_dir: string, output_dir: string, cache_dir: ?string}} $config
      */
     #[\Override]
     public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
     {
         $builder->setParameter('ubermuda_symfony_extra.coverage.source_dir', $config['coverage']['source_dir']);
         $builder->setParameter('ubermuda_symfony_extra.coverage.output_dir', $config['coverage']['output_dir']);
+        $builder->setParameter('ubermuda_symfony_extra.coverage.cache_dir', $config['coverage']['cache_dir']);
 
         $container->import(__DIR__.'/../config/services.php');
     }

@@ -73,11 +73,20 @@ use: { extraHTTPHeaders: { 'X-Playwright': '1' } }
 ### `CoverageSubscriber`
 
 Collects PHP line coverage for requests carrying `X-Coverage`, writing one
-`.cov` file per request for later merging. Requires `sebastian/code-coverage`
-and the `xdebug` extension — both no-ops when absent.
+`.cov` file per request for later merging. Requires `phpunit/php-code-coverage`
+and the `xdebug` extension. Without them, the subscriber does nothing. The bundle
+registers it in the `dev` and `test` environments only.
 
-Source and output directories default to `%kernel.project_dir%/src` and
-`%kernel.project_dir%/var/coverage`; override them if needed:
+Each `.cov` file holds only the source files that the request ran. Merge it with
+one baseline file that lists every source file, so that the report still counts
+the files that no request reached.
+
+The subscriber reads its static analysis from `cache_dir`. Fill that cache once
+before the test run with `XDEBUG_MODE=coverage vendor/bin/phpunit --warm-coverage-cache`.
+With an empty cache, each request parses the files it ran. Set `cache_dir` to
+`null` to switch the cache off.
+
+The directories default as below. Override them if needed:
 
 ```yaml
 # config/packages/ubermuda_symfony_extra.yaml
@@ -85,6 +94,7 @@ ubermuda_symfony_extra:
     coverage:
         source_dir: '%kernel.project_dir%/src'
         output_dir: '%kernel.project_dir%/var/coverage'
+        cache_dir: '%kernel.project_dir%/.phpunit.cache/code-coverage'
 ```
 
 ## License

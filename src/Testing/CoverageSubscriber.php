@@ -19,8 +19,12 @@ use Symfony\Component\HttpKernel\KernelEvents;
  * directory. Enables end-to-end coverage from browser-driven (Playwright) test
  * runs; the .cov files are merged into a report afterwards.
  *
- * Requires the sebastian/code-coverage package and the xdebug extension; both
+ * Requires the phpunit/php-code-coverage package and the xdebug extension; both
  * are no-ops when absent, so this subscriber is harmless when coverage is off.
+ *
+ * Each file records only the source files the request ran. Without that, the
+ * end of every request parses the whole source directory. The parse results
+ * come from the cache directory, which `phpunit --warm-coverage-cache` fills.
  */
 final class CoverageSubscriber implements EventSubscriberInterface
 {
@@ -31,6 +35,7 @@ final class CoverageSubscriber implements EventSubscriberInterface
     public function __construct(
         private readonly string $sourceDir,
         private readonly string $outputDir,
+        private readonly ?string $cacheDir = null,
     ) {
     }
 
@@ -67,6 +72,10 @@ final class CoverageSubscriber implements EventSubscriberInterface
         }
 
         $this->coverage = new CodeCoverage(new Selector()->forLineCoverage($filter), $filter);
+        $this->coverage->excludeUncoveredFiles();
+        if (null !== $this->cacheDir && '' !== $this->cacheDir) {
+            $this->coverage->cacheStaticAnalysis($this->cacheDir);
+        }
         $this->coverage->start('request');
     }
 
